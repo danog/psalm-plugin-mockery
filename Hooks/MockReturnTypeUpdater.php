@@ -33,8 +33,7 @@ class MockReturnTypeUpdater implements AfterMethodCallAnalysisInterface
                 && $first_arg->name instanceof PhpParser\Node\Identifier
                 && $first_arg->name->name === 'class'
             ) {
-                /** @var class-string */
-                $fq_class_name = $first_arg->class->getAttribute('resolvedName');
+                $fq_class_name = (string) $first_arg->class->attrs()->resolvedName;
             } elseif (
                 $first_arg instanceof PhpParser\Node\Expr\BinaryOp\Concat
                 && $first_arg->left instanceof PhpParser\Node\Expr\ClassConstFetch
@@ -44,8 +43,7 @@ class MockReturnTypeUpdater implements AfterMethodCallAnalysisInterface
                 && $first_arg->right->value[0] === '['
             ) {
                 $left = $first_arg->left;
-                /** @var class-string */
-                $fq_class_name = $left->class->getAttribute('resolvedName');
+                $fq_class_name = (string) $left->class->attrs()->resolvedName;
             } elseif ($first_arg instanceof PhpParser\Node\Scalar\String_) {
                 $value = $first_arg->value;
                 if (substr($value, 0, 6) === 'alias:') {
