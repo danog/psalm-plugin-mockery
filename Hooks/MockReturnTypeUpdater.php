@@ -4,6 +4,7 @@ namespace Psalm\MockeryPlugin\Hooks;
 
 use PhpParser;
 use PhpParser\Node\Arg;
+use Psalm\Internal\Interner;
 use Psalm\Plugin\EventHandler\AfterMethodCallAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterMethodCallAnalysisEvent;
 use Psalm\Type;
@@ -33,7 +34,7 @@ class MockReturnTypeUpdater implements AfterMethodCallAnalysisInterface
                 && $first_arg->name instanceof PhpParser\Node\Identifier
                 && $first_arg->name->name === 'class'
             ) {
-                $fq_class_name = (string) $first_arg->class->attrs()->resolvedName;
+                $fq_class_name = (string) Interner::lookupOrNull($first_arg->class->attrs()->resolvedId);
             } elseif (
                 $first_arg instanceof PhpParser\Node\Expr\BinaryOp\Concat
                 && $first_arg->left instanceof PhpParser\Node\Expr\ClassConstFetch
@@ -43,7 +44,7 @@ class MockReturnTypeUpdater implements AfterMethodCallAnalysisInterface
                 && $first_arg->right->value[0] === '['
             ) {
                 $left = $first_arg->left;
-                $fq_class_name = (string) $left->class->attrs()->resolvedName;
+                $fq_class_name = (string) Interner::lookupOrNull($left->class->attrs()->resolvedId);
             } elseif ($first_arg instanceof PhpParser\Node\Scalar\String_) {
                 $value = $first_arg->value;
                 if (substr($value, 0, 6) === 'alias:') {
